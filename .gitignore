@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets / keys
+*.pem
+*.key
+id_rsa*
+balr_VPS*
+
+# Temp / build
+*.tmp
+*.log
+__pycache__/
+*.pyc

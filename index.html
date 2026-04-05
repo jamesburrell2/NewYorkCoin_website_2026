@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewYorkCoin (NYC) — Fast. Free. The People's Blockchain Since 2014.</title>
+<meta name="description" content="NewYorkCoin is a lightning-fast, zero-fee, decentralized Layer 1 blockchain. 30-second confirmations. No fees. Anywhere in the world. Community-governed since 2014.">
+<meta property="og:title" content="NewYorkCoin (NYC) — Fast. Free. The People's Blockchain.">
+<meta property="og:description" content="30-second blocks. Zero fees. Scrypt PoW. Community-governed since March 6, 2014.">
+<meta property="og:url" content="https://paywith.nyc">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --navy:        #041E42;
+  --navy-mid:    #0a3060;
+  --blue-mid:    #0a5498;
+  --blue:        #1a6ec4;
+  --sky:         #009EDC;
+  --sky-light:   #56bcec;
+  --bg:          #ffffff;
+  --bg-subtle:   #f0f5fb;
+  --surface:     #dceaf7;
+  --border:      #c2d8ee;
+  --text:        #041E42;
+  --text-muted:  #2a5080;
+  --text-subtle: #5889b0;
+  --grad:        linear-gradient(135deg,#041E42 0%,#0a5498 45%,#009EDC 100%);
+  --grad-soft:   linear-gradient(135deg,#f0f5fb 0%,#dceaf7 50%,#bdd8f0 100%);
+  --grad-accent: linear-gradient(90deg,#009EDC,#56bcec);
+  --sans:  'Space Grotesk', system-ui, sans-serif;
+  --body:  'Inter', system-ui, sans-serif;
+  --mono:  'JetBrains Mono', monospace;
+  --tx-xs:   clamp(.75rem,  .7rem  + .25vw, .875rem);
+  --tx-sm:   clamp(.875rem, .8rem  + .35vw, 1rem);
+  --tx-base: clamp(1rem,    .9rem  + .5vw,  1.125rem);
+  --tx-lg:   clamp(1.125rem,1rem   + .6vw,  1.375rem);
+  --tx-xl:   clamp(1.5rem,  1.25rem+1.25vw, 2rem);
+  --tx-2xl:  clamp(2rem,    1.5rem +2.5vw,  3.5rem);
+  --tx-3xl:  clamp(2.5rem,  2rem   +3vw,    5rem);
+  --tx-4xl:  clamp(3rem,    2.5rem +4vw,    7rem);
+  --sp-xl:   clamp(3rem,6vw,8rem);
+  --sp-2xl:  clamp(5rem,10vw,14rem);
+  --ease-expo: cubic-bezier(.16,1,.3,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --r-sm:4px; --r-md:8px; --r-lg:16px; --r-xl:24px; --r-full:9999px;
+}
+
+/* ─── RESET ──────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{font-family:var(--body);font-size:var(--tx-base);color:var(--text);background:var(--bg);line-height:1.6;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* ─── GRAIN ──────────────────────────────────────────────────── */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ─── SCROLL PROGRESS ───────────────────────────────────────── */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:var(--grad-accent);transform-origin:left;transform:scaleX(0);z-index:10000}
+
+/* ─── CURSOR ─────────────────────────────────────────────────── */
+*{cursor:none}
+.c-dot{position:fixed;width:6px;height:6px;background:var(--sky);border-radius:50%;pointer-events:none;z-index:10001;transform:translate(-50%,-50%)}
+.c-ring{position:fixed;width:36px;height:36px;border:1.5px solid var(--sky);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:width .3s var(--ease-expo),height .3s var(--ease-expo),background .3s}
+body:has(a:hover,button:hover) .c-ring{width:56px;height:56px;background:color-mix(in srgb,var(--sky) 10%,transparent)}
+
+/* ─── LOADER ─────────────────────────────────────────────────── */
+.loader{position:fixed;inset:0;background:var(--navy);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem}
+.loader-logo{opacity:0;transform:translateY(12px)}
+.loader-bar-wrap{width:160px;height:1px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+.loader-bar-fill{position:absolute;inset:0;background:var(--grad-accent);transform:scaleX(0);transform-origin:left;transition:transform .05s linear}
+.loader-count{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;color:rgba(255,255,255,.35)}
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem clamp(1.5rem,5vw,4rem);display:flex;align-items:center;justify-content:space-between;transition:background .4s,padding .4s,backdrop-filter .4s}
+.nav.scrolled{background:rgba(255,255,255,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding-block:1rem;border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.7rem}
+.logo-mark{width:36px;height:36px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-weight:700;font-size:11px;color:#fff;letter-spacing:.02em;flex-shrink:0;transition:background .4s}
+.nav:not(.scrolled) .logo-mark{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
+.logo-img-wrap{height:34px;display:none}
+.logo-img-wrap img{height:100%;width:auto}
+.nav-wordmark{font-family:var(--sans);font-weight:700;font-size:var(--tx-sm);letter-spacing:-.01em;color:#fff;transition:color .4s}
+.nav-wordmark span{color:var(--sky)}
+.nav.scrolled .nav-wordmark{color:var(--text)}
+.nav-links{display:flex;gap:2.25rem;align-items:center}
+.nl{font-family:var(--sans);font-size:var(--tx-sm);font-weight:500;color:rgba(255,255,255,.85);position:relative;transition:color .3s}
+.nav.scrolled .nl{color:var(--text-muted)}
+.nl::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .4s var(--ease-expo)}
+.nl:hover::after{transform:scaleX(1);transform-origin:left}
+.nl:hover{color:var(--sky)}
+.nav.scrolled .nl:hover{color:var(--sky)}
+.nav-cta{padding:.55em 1.4em;background:var(--grad);color:#fff!important;border-radius:var(--r-full);font-size:var(--tx-xs);font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:opacity .3s,transform .3s}
+.nav-cta:hover{opacity:.9;transform:translateY(-1px)}
+.nav-cta::after{display:none!important}
+.menu-btn{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.menu-btn span{display:block;width:24px;height:1.5px;background:#fff;transition:transform .3s,opacity .3s}
+.nav.scrolled .menu-btn span{background:var(--text)}
+.menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mob-nav{position:fixed;inset:0;background:var(--navy);z-index:900;display:flex;flex-direction:column;justify-content:center;padding:clamp(2rem,8vw,6rem);clip-path:circle(0% at calc(100% - 2rem) 2rem);transition:clip-path .7s var(--ease-expo);pointer-events:none}
+.mob-nav.open{clip-path:circle(150% at calc(100% - 2rem) 2rem);pointer-events:auto}
+.mob-link{font-family:var(--sans);font-size:clamp(2rem,6vw,3.5rem);font-weight:700;color:#fff;letter-spacing:-.02em;padding:.35em 0;border-bottom:1px solid rgba(255,255,255,.08);display:block;transition:color .3s}
+.mob-link:hover{color:var(--sky)}
+
+/* ─── LAYOUT ─────────────────────────────────────────────────── */
+.wrap{width:100%;max-width:1400px;margin-inline:auto;padding-inline:clamp(1.5rem,5vw,5rem)}
+.sec{padding-block:var(--sp-2xl)}
+.sec-sm{padding-block:var(--sp-xl)}
+.eyebrow{font-family:var(--mono);font-size:var(--tx-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--sky);margin-bottom:.85rem}
+.sec-title{font-family:var(--sans);font-size:var(--tx-3xl);font-weight:700;letter-spacing:-.025em;line-height:1.05;color:var(--text);margin-bottom:1.25rem}
+.sec-sub{font-size:var(--tx-lg);color:var(--text-muted);max-width:52ch;line-height:1.75}
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:clamp(4rem,8vw,7rem);overflow:hidden;background:var(--navy)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,158,220,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,158,220,.055) 1px,transparent 1px);background-size:60px 60px;animation:grid-move 22s linear infinite}
+@keyframes grid-move{0%{transform:translateY(0)}100%{transform:translateY(60px)}}
+.hero-glow{position:absolute;width:80vw;height:80vw;max-width:900px;top:-20%;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(0,158,220,.18) 0%,transparent 70%);pointer-events:none}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
+.orb1{width:420px;height:420px;background:rgba(10,84,152,.55);top:5%;left:-8%;animation:orb 9s ease-in-out infinite}
+.orb2{width:320px;height:320px;background:rgba(0,158,220,.3);bottom:15%;right:-5%;animation:orb 11s ease-in-out infinite reverse}
+@keyframes orb{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-32px) scale(1.06)}}
+.hero-content{position:relative;z-index:2}
+.hero-eyebrow{font-family:var(--mono);font-size:var(--tx-xs);letter-spacing:.15em;text-transform:uppercase;color:var(--sky);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.hero-eyebrow::before{content:'';display:block;width:32px;height:1px;background:var(--sky)}
+.hero-title{font-family:var(--sans);font-size:var(--tx-4xl);font-weight:700;letter-spacing:-.035em;line-height:1.0;color:#fff;margin-bottom:2rem}
+.hero-title .grad-text{background:var(--grad-accent);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:var(--tx-lg);color:rgba(255,255,255,.62);max-width:46ch;line-height:1.8;margin-bottom:3rem}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.btn-prim{display:inline-flex;align-items:center;gap:.5rem;padding:.85em 2em;background:var(--grad-accent);color:#fff;border-radius:var(--r-full);font-family:var(--sans);font-size:var(--tx-sm);font-weight:600;border:none;transition:opacity .3s,transform .3s}
+.btn-prim:hover{opacity:.88;transform:translateY(-2px)}
+.btn-out{display:inline-flex;align-items:center;gap:.5rem;padding:.85em 2em;border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:var(--r-full);font-family:var(--sans);font-size:var(--tx-sm);font-weight:500;transition:border-color .3s,background .3s}
+.btn-out:hover{border-color:var(--sky);background:rgba(0,158,220,.1)}
+.scroll-hint{position:absolute;bottom:2.5rem;right:clamp(1.5rem,5vw,5rem);display:flex;align-items:center;gap:1rem;font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3);writing-mode:vertical-rl}
+.scroll-line{width:1px;height:60px;background:linear-gradient(to bottom,var(--sky),transparent);animation:sline 1.8s ease-in-out infinite}
+@keyframes sline{0%{transform:scaleY(0);transform-origin:top}49%{transform:scaleY(1);transform-origin:top}50%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ─── TICKER ─────────────────────────────────────────────────── */
+.ticker{overflow:hidden;background:var(--navy);border-top:1px solid rgba(255,255,255,.07);padding-block:1.1rem}
+.ticker-track{display:flex;width:max-content;animation:tick 40s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-set{display:flex;align-items:center;gap:2.5rem;padding-right:2.5rem;white-space:nowrap}
+.ticker-set span{font-family:var(--mono);font-size:var(--tx-xs);letter-spacing:.1em;color:rgba(255,255,255,.4);text-transform:uppercase}
+.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--sky);opacity:.6;flex-shrink:0}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ─── STATS ──────────────────────────────────────────────────── */
+.stats-sec{background:var(--navy);padding-block:var(--sp-xl)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:var(--r-lg);overflow:hidden}
+.stat-card{background:rgba(255,255,255,.025);padding:clamp(1.5rem,3vw,2.5rem);text-align:center;transition:background .3s}
+.stat-card:hover{background:rgba(0,158,220,.07)}
+.stat-num{font-family:var(--sans);font-size:var(--tx-3xl);font-weight:700;letter-spacing:-.025em;color:#fff;line-height:1;display:flex;align-items:baseline;justify-content:center;gap:.1em}
+.stat-unit{font-size:.48em;color:var(--sky);font-weight:500}
+.stat-lbl{font-family:var(--mono);font-size:var(--tx-xs);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:.75rem}
+
+/* ─── ABOUT ──────────────────────────────────────────────────── */
+.about-sec{background:var(--bg)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(3rem,6vw,7rem);align-items:center}
+.about-vis{border-radius:var(--r-xl);overflow:hidden;aspect-ratio:4/3;background:var(--grad);position:relative}
+.about-vis-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.coin-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.coin-logo{width:62%;max-width:280px;height:auto;object-fit:contain;filter:drop-shadow(0 0 40px rgba(0,158,220,.55)) drop-shadow(0 8px 24px rgba(0,0,0,.35))}
+.about-mini-row{display:flex;gap:1.25rem;margin-top:2.5rem}
+.mini-stat{padding:1.1rem 1.35rem;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--r-md);flex:1}
+.mini-num{font-family:var(--sans);font-size:var(--tx-xl);font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.mini-lbl{font-size:var(--tx-xs);color:var(--text-subtle);margin-top:.2rem}
+
+/* ─── FEATURES ───────────────────────────────────────────────── */
+.feat-sec{background:var(--bg-subtle)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border);border:1.5px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-top:3.5rem}
+.feat-card{background:#fff;padding:clamp(2rem,4vw,3rem);transition:background .3s}
+.feat-card:hover{background:var(--bg-subtle)}
+.feat-icon{width:52px;height:52px;border-radius:var(--r-md);background:var(--grad);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;color:#fff}
+.feat-icon svg{width:24px;height:24px}
+.feat-card h3{font-family:var(--sans);font-size:var(--tx-xl);font-weight:700;letter-spacing:-.01em;color:var(--navy);margin-bottom:.65rem}
+.feat-card p{color:var(--text-muted);line-height:1.78;font-size:var(--tx-base)}
+
+/* ─── SPECS ──────────────────────────────────────────────────── */
+.specs-sec{background:var(--bg)}
+.spec-table{width:100%;border-collapse:collapse;margin-top:3rem;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.spec-table tr:not(:last-child){border-bottom:1px solid var(--border)}
+.spec-table tr:nth-child(even) td{background:var(--bg-subtle)}
+.spec-table td{padding:1rem 1.75rem;font-size:var(--tx-sm)}
+.spec-table td:first-child{font-family:var(--mono);font-size:var(--tx-xs);letter-spacing:.05em;color:var(--text-subtle);text-transform:uppercase;width:32%;border-right:1px solid var(--border)}
+.spec-table td:last-child{font-family:var(--sans);font-weight:600;color:var(--navy)}
+.spec-hi{color:var(--sky)!important}
+
+/* ─── UPGRADES ───────────────────────────────────────────────── */
+.up-sec{background:var(--navy);position:relative;overflow:hidden}
+.up-sec::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,158,220,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,158,220,.04) 1px,transparent 1px);background-size:60px 60px}
+.up-sec .eyebrow{color:var(--sky)}
+.up-sec .sec-title{color:#fff}
+.up-sec .sec-sub{color:rgba(255,255,255,.5)}
+.up-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:3.5rem;position:relative;z-index:1}
+.up-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-xl);padding:clamp(1.75rem,3vw,2.5rem);transition:background .3s,border-color .3s,transform .3s;position:relative;overflow:hidden}
+.up-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--grad-accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease-expo)}
+.up-card:hover::before{transform:scaleX(1)}
+.up-card:hover{background:rgba(0,158,220,.07);border-color:rgba(0,158,220,.25);transform:translateY(-3px)}
+.up-tag{display:inline-flex;padding:.3em .8em;border-radius:var(--r-full);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.1rem}
+.tag-planned{background:rgba(0,158,220,.12);border:1px solid rgba(0,158,220,.25);color:var(--sky)}
+.tag-active{background:rgba(0,220,130,.1);border:1px solid rgba(0,220,130,.25);color:#00dc82}
+.up-card h3{font-family:var(--sans);font-size:var(--tx-xl);font-weight:700;color:#fff;letter-spacing:-.01em;margin-bottom:.65rem}
+.up-card p{color:rgba(255,255,255,.48);font-size:var(--tx-sm);line-height:1.78}
+.up-num{position:absolute;bottom:1.25rem;right:1.5rem;font-family:var(--mono);font-size:clamp(3rem,6vw,5rem);font-weight:700;color:rgba(255,255,255,.03);letter-spacing:-.04em;line-height:1;pointer-events:none}
+
+/* ─── EXCHANGES ──────────────────────────────────────────────── */
+.ex-sec{background:var(--bg-subtle)}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-top:3rem}
+.ex-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;text-align:center;transition:border-color .3s,transform .3s,box-shadow .3s;display:flex;flex-direction:column;align-items:center;gap:.65rem}
+.ex-card:hover{border-color:var(--sky);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,158,220,.1)}
+.ex-badge{width:48px;height:48px;border-radius:var(--r-md);background:var(--grad-soft);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-weight:700;font-size:var(--tx-sm);color:var(--navy)}
+.ex-name{font-family:var(--sans);font-weight:600;font-size:var(--tx-sm);color:var(--navy)}
+.ex-desc{font-size:var(--tx-xs);color:var(--text-subtle)}
+
+/* ─── WALLETS ────────────────────────────────────────────────── */
+.wal-sec{background:var(--bg)}
+.wal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:3rem}
+.wal-card{border:1px solid var(--border);border-radius:var(--r-xl);padding:2rem;transition:border-color .3s,transform .3s}
+.wal-card:hover{border-color:var(--sky);transform:translateY(-3px)}
+.wal-os{width:44px;height:44px;border-radius:var(--r-md);background:var(--bg-subtle);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:var(--navy)}
+.wal-os svg{width:24px;height:24px}
+.wal-card h3{font-family:var(--sans);font-weight:600;font-size:var(--tx-lg);color:var(--navy);margin-bottom:.35rem}
+.wal-card p{font-size:var(--tx-sm);color:var(--text-muted);margin-bottom:1.5rem;line-height:1.65}
+.wal-link{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--sans);font-size:var(--tx-xs);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--sky);transition:gap .3s}
+.wal-link:hover{gap:.75rem}
+.wal-link svg{width:14px;height:14px}
+
+/* ─── COMMUNITY ──────────────────────────────────────────────── */
+.com-sec{background:var(--bg-subtle)}
+.com-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-top:3rem}
+.com-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);padding:1.75rem;text-align:center;transition:border-color .3s,transform .3s,box-shadow .3s;display:block}
+.com-card:hover{border-color:var(--sky);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,158,220,.1)}
+.com-icon{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.3rem}
+.com-card h3{font-family:var(--sans);font-weight:600;font-size:var(--tx-base);color:var(--navy);margin-bottom:.3rem}
+.com-card p{font-size:var(--tx-xs);color:var(--text-subtle)}
+
+/* ─── MERCHANTS ──────────────────────────────────────────────── */
+.mer-sec{background:var(--bg)}
+.mer-box{background:var(--grad);border-radius:var(--r-xl);padding:clamp(2.5rem,5vw,4rem);display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;margin-top:3rem}
+.mer-box h2{font-family:var(--sans);font-size:var(--tx-2xl);font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:.65rem}
+.mer-box p{color:rgba(255,255,255,.62);font-size:var(--tx-base);max-width:48ch;line-height:1.75}
+.btn-white{display:inline-flex;align-items:center;gap:.5rem;padding:.9em 2.2em;background:#fff;color:var(--navy);border-radius:var(--r-full);font-family:var(--sans);font-size:var(--tx-sm);font-weight:700;white-space:nowrap;transition:opacity .3s,transform .3s;flex-shrink:0}
+.btn-white:hover{opacity:.92;transform:translateY(-2px)}
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+.foot{background:var(--navy);padding-block:var(--sp-xl);border-top:1px solid rgba(255,255,255,.05)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.foot-brand p{color:rgba(255,255,255,.42);font-size:var(--tx-sm);line-height:1.8;max-width:30ch;margin-top:.85rem}
+.foot-logo{display:flex;align-items:center;gap:.65rem;margin-bottom:.35rem}
+.foot-col h4{font-family:var(--sans);font-size:var(--tx-xs);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:1.1rem}
+.foot-col ul{display:flex;flex-direction:column;gap:.6rem}
+.foot-col a{font-size:var(--tx-sm);color:rgba(255,255,255,.52);transition:color .3s}
+.foot-col a:hover{color:var(--sky)}
+.foot-bottom{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.foot-bottom p{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.22)}
+.foot-badge{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--sky);opacity:.65}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:1024px){
+  .about-grid{grid-template-columns:1fr}
+  .about-vis{aspect-ratio:16/7}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:2.5rem}
+  .foot-brand{grid-column:1/-1}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .menu-btn{display:flex}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .feat-grid{grid-template-columns:1fr}
+  .up-grid{grid-template-columns:1fr}
+  .mer-box{grid-template-columns:1fr;text-align:center}
+  .mer-box p{margin-inline:auto}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .foot-bottom{flex-direction:column;text-align:center}
+  *{cursor:auto}
+  .c-dot,.c-ring{display:none}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr}
+  .about-mini-row{flex-direction:column}
+  .foot-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-logo" id="loader-logo">
+    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+      <circle cx="30" cy="30" r="28" stroke="rgba(0,158,220,.25)" stroke-width="1.5"/>
+      <circle cx="30" cy="30" r="28" stroke="url(#lg1)" stroke-width="1.5" stroke-dasharray="176" stroke-dashoffset="176" id="loader-ring">
+        <animate attributeName="stroke-dashoffset" from="176" to="0" dur="1s" fill="freeze"/>
+      </circle>
+      <text x="30" y="34" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="12" fill="white" letter-spacing="-0.4">NYC</text>
+      <defs>
+        <linearGradient id="lg1" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#009EDC"/>
+          <stop offset="100%" stop-color="#041E42"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  <div class="loader-bar-wrap"><div class="loader-bar-fill" id="lbar"></div></div>
+  <span class="loader-count" id="lcount">0</span>
+</div>
+
+<!-- CURSOR -->
+<div class="c-dot" id="cdot"></div>
+<div class="c-ring" id="cring"></div>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="sprogress"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#home" class="nav-logo">
+    <div class="logo-img-wrap" id="logo-img-wrap">
+      <img src="nyc-logo-sm.png" id="logo-img" alt="NewYorkCoin">
+    </div>
+    <div class="logo-mark" id="logo-mark" style="display:none">NYC</div>
+    <span class="nav-wordmark">NewYork<span>Coin</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about"     class="nl">About</a></li>
+    <li><a href="#features"  class="nl">Features</a></li>
+    <li><a href="#upgrades"  class="nl">Upgrades</a></li>
+    <li><a href="#exchanges" class="nl">Exchanges</a></li>
+    <li><a href="#wallets"   class="nl">Wallets</a></li>
+    <li><a href="#community" class="nl">Community</a></li>
+    <li><a href="https://github.com/NewYorkCoinNYC/newyorkcoin" target="_blank" class="nl nav-cta">GitHub</a></li>
+  </ul>
+  <button class="menu-btn" id="mbtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- MOBILE MENU -->
+<nav class="mob-nav" id="mobnav">
+  <ul>
+    <li><a href="#about"     class="mob-link">About</a></li>
+    <li><a href="#features"  class="mob-link">Features</a></li>
+    <li><a href="#upgrades"  class="mob-link">Upgrades</a></li>
+    <li><a href="#exchanges" class="mob-link">Exchanges</a></li>
+    <li><a href="#wallets"   class="mob-link">Wallets</a></li>
+    <li><a href="#community" class="mob-link">Community</a></li>
+    <li><a href="#merchants" class="mob-link">Merchants</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────────── -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="wrap hero-content">
+    <p class="hero-eyebrow" data-reveal>The People's Blockchain — Since March 6, 2014</p>
+    <h1 class="hero-title" id="htitle">
+      Fast. Free.<br><span class="grad-text">New York.</span>
+    </h1>
+    <p class="hero-sub" data-reveal>NewYorkCoin is a lightning-fast, zero-fee, decentralized Layer 1 blockchain. 30-second block confirmations. No fees. Anywhere in the world.</p>
+    <div class="hero-actions" data-reveal>
+      <a href="#wallets"   class="btn-prim mag">Get a Wallet <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#about"     class="btn-out">Learn More</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- ── TICKER ─────────────────────────────────────────────────── -->
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-set">
+      <div class="ticker-dot"></div><span>30-Second Blocks</span>
+      <div class="ticker-dot"></div><span>Zero Transaction Fees</span>
+      <div class="ticker-dot"></div><span>Scrypt Proof-of-Work</span>
+      <div class="ticker-dot"></div><span>Since 2014</span>
+      <div class="ticker-dot"></div><span>Anonymous &amp; Decentralized</span>
+      <div class="ticker-dot"></div><span>20× Faster Than Bitcoin</span>
+      <div class="ticker-dot"></div><span>5× Faster Than Litecoin</span>
+      <div class="ticker-dot"></div><span>Open Source</span>
+      <div class="ticker-dot"></div><span>Community Governed</span>
+      <div class="ticker-dot"></div><span>No Pre-Mine</span>
+    </div>
+    <div class="ticker-set" aria-hidden="true">
+      <div class="ticker-dot"></div><span>30-Second Blocks</span>
+      <div class="ticker-dot"></div><span>Zero Transaction Fees</span>
+      <div class="ticker-dot"></div><span>Scrypt Proof-of-Work</span>
+      <div class="ticker-dot"></div><span>Since 2014</span>
+      <div class="ticker-dot"></div><span>Anonymous &amp; Decentralized</span>
+      <div class="ticker-dot"></div><span>20× Faster Than Bitcoin</span>
+      <div class="ticker-dot"></div><span>5× Faster Than Litecoin</span>
+      <div class="ticker-dot"></div><span>Open Source</span>
+      <div class="ticker-dot"></div><span>Community Governed</span>
+      <div class="ticker-dot"></div><span>No Pre-Mine</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── STATS ──────────────────────────────────────────────────── -->
+<section class="stats-sec" id="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num"><span class="ctr" data-t="30" data-s="s">0</span><span class="stat-unit">block</span></div>
+        <p class="stat-lbl">Confirmation Time</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num"><span>$0</span><span class="stat-unit">.00</span></div>
+        <p class="stat-lbl">Transaction Fees</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num"><span class="ctr" data-t="20">0</span><span class="stat-unit">×</span></div>
+        <p class="stat-lbl">Faster Than Bitcoin</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num"><span class="ctr" data-t="2014">0</span></div>
+        <p class="stat-lbl">Born in New York</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────────────────────── -->
+<section class="sec about-sec" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-vis img-reveal">
+        <div class="about-vis-grid"></div>
+        <div class="coin-big"><img src="nyc-logo.png" alt="NewYorkCoin Logo" class="coin-logo"></div>
+      </div>
+      <div>
+        <p class="eyebrow reveal">Our Story</p>
+        <h2 class="sec-title rl">The Blockchain Built for the People, by the People</h2>
+        <p class="sec-sub reveal" style="margin-bottom:1.1rem">NewYorkCoin launched March 6, 2014 — a Litecoin fork designed from day one to be lightning-fast and completely fee-free. No ICO. No pre-mine. Pure, open-source, community-driven cryptocurrency.</p>
+        <p class="reveal" style="color:var(--text-muted);line-height:1.82;font-size:var(--tx-base);max-width:50ch">In 2017, a volunteer development team committed to realizing NYC's full potential as a global, permission-less, zero-fee payment solution — establishing the New York Coin Center to lead the effort. Today, that mission continues with a full modernization of the codebase and wallet ecosystem.</p>
+        <div class="about-mini-row reveal">
+          <div class="mini-stat"><div class="mini-num">143B</div><div class="mini-lbl">NYC in circulation</div></div>
+          <div class="mini-stat"><div class="mini-num">10+</div><div class="mini-lbl">Years of unbroken blocks</div></div>
+          <div class="mini-stat"><div class="mini-num">∞</div><div class="mini-lbl">Possible transactions</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────────────────── -->
+<section class="sec feat-sec" id="features">
+  <div class="wrap">
+    <div style="max-width:620px">
+      <p class="eyebrow reveal">Core Properties</p>
+      <h2 class="sec-title rl">Built Different. By Design.</h2>
+      <p class="sec-sub reveal">Three properties that set NewYorkCoin apart from every other cryptocurrency.</p>
+    </div>
+    <div class="feat-grid cg">
+      <div class="feat-card cv">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3>Instant Confirmation</h3>
+        <p>Transactions confirm in 30 seconds — more than 20× faster than Bitcoin and 5× faster than Litecoin. Accept NYC at the register without waiting.</p>
+      </div>
+      <div class="feat-card cv">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Zero Transaction Fees</h3>
+        <p>Send and receive NYC anywhere in the world for free — forever. No mining fees, no congestion surcharges. The only Layer 1 blockchain with true zero-cost transfers.</p>
+      </div>
+      <div class="feat-card cv">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Secure &amp; Anonymous</h3>
+        <p>Scrypt proof-of-work consensus. Fully decentralized — no central authority, no admin keys. Your transactions are private. Your coins are yours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SPECS ──────────────────────────────────────────────────── -->
+<section class="sec specs-sec" id="specs">
+  <div class="wrap">
+    <p class="eyebrow reveal">Under the Hood</p>
+    <h2 class="sec-title rl">Technical Specifications</h2>
+    <table class="spec-table reveal">
+      <tbody>
+        <tr><td>Ticker Symbol</td><td class="spec-hi">NYC</td></tr>
+        <tr><td>Algorithm</td><td>Scrypt (Proof-of-Work)</td></tr>
+        <tr><td>Block Time</td><td class="spec-hi">30 Seconds</td></tr>
+        <tr><td>Transaction Fees</td><td class="spec-hi">Zero (Free)</td></tr>
+        <tr><td>Recommended Confirmations</td><td>6 Blocks (~3 minutes)</td></tr>
+        <tr><td>Total Supply</td><td>~143.76 Billion NYC</td></tr>
+        <tr><td>Consensus Mechanism</td><td>Proof-of-Work (PoW)</td></tr>
+        <tr><td>Forked From</td><td>Litecoin / Bitcoin</td></tr>
+        <tr><td>Genesis Block</td><td>March 6, 2014</td></tr>
+        <tr><td>Network</td><td>Fully Decentralized / Open Source</td></tr>
+        <tr><td>Privacy</td><td>Anonymous Transactions</td></tr>
+        <tr><td>Block Explorer</td><td><a href="https://chainz.cryptoid.info/nyc/" target="_blank" style="color:var(--sky)">chainz.cryptoid.info/nyc</a></td></tr>
+        <tr><td>Source Code</td><td><a href="https://github.com/NewYorkCoinNYC/newyorkcoin" target="_blank" style="color:var(--sky)">github.com/NewYorkCoinNYC/newyorkcoin</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── UPGRADES ───────────────────────────────────────────────── -->
+<section class="sec up-sec" id="upgrades">
+  <div class="wrap">
+    <p class="eyebrow">Roadmap</p>
+    <h2 class="sec-title" style="max-width:580px">NYC is Getting a Major Upgrade</h2>
+    <p class="sec-sub">The community is actively building the next generation of NewYorkCoin — bringing it to feature parity with the latest Litecoin codebase and beyond.</p>
+    <div class="up-grid">
+      <div class="up-card">
+        <span class="up-tag tag-planned">In Development</span>
+        <h3>MimbleWimble Extension Blocks (MWEB)</h3>
+        <p>Porting Litecoin's flagship privacy upgrade to NewYorkCoin. MWEB introduces Confidential Transactions — hiding sender, receiver, and amounts from the public ledger while remaining fully verifiable on-chain. True financial privacy, finally available on NYC.</p>
+        <span class="up-num">01</span>
+      </div>
+      <div class="up-card">
+        <span class="up-tag tag-planned">In Development</span>
+        <h3>Modern BIP Compliance</h3>
+        <p>Full modernization of the NYC codebase to support the latest Bitcoin Improvement Proposals — including SegWit, updated scripting capabilities, and hardened network security upgrades. NYC will be fully compatible with the modern Bitcoin and Litecoin ecosystem.</p>
+        <span class="up-num">02</span>
+      </div>
+      <div class="up-card">
+        <span class="up-tag tag-planned">In Development</span>
+        <h3>Coinomi-Style Multi-Coin Wallet</h3>
+        <p>A full-featured, non-custodial mobile and desktop wallet — built with NYC as the centerpiece, alongside support for major cryptocurrencies. Clean UX, hardware wallet support, and built-in exchange. Your keys. Your coins. One app.</p>
+        <span class="up-num">03</span>
+      </div>
+      <div class="up-card">
+        <span class="up-tag tag-active">Ongoing</span>
+        <h3>Merchant Payment Infrastructure</h3>
+        <p>NYC's zero-fee, 30-second confirmation model makes it ideal for retail. We're building merchant tooling — point-of-sale integrations, payment processor APIs, and e-commerce plugins — to make accepting NYC effortless for businesses worldwide.</p>
+        <span class="up-num">04</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EXCHANGES ──────────────────────────────────────────────── -->
+<section class="sec ex-sec" id="exchanges">
+  <div class="wrap">
+    <p class="eyebrow reveal">Trade NYC</p>
+    <h2 class="sec-title rl">Available on Exchanges</h2>
+    <p class="sec-sub reveal">NewYorkCoin is currently trading on FreiExchange. Additional listings in progress.</p>
+    <div class="ex-grid cg" style="justify-content:center">
+      <a href="https://freiexchange.com/market/NYC/BTC" target="_blank" rel="noopener" class="ex-card cv">
+        <div class="ex-badge">FX</div>
+        <div class="ex-name">FreiExchange</div>
+        <div class="ex-desc">NYC/BTC · Community trading</div>
+      </a>
+      <div class="ex-card cv" style="border-style:dashed;pointer-events:none">
+        <div class="ex-badge" style="background:var(--bg);color:var(--text-subtle)">+</div>
+        <div class="ex-name" style="color:var(--text-subtle)">More Coming</div>
+        <div class="ex-desc">New listings being pursued</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WALLETS ────────────────────────────────────────────────── -->
+<section class="sec wal-sec" id="wallets">
+  <div class="wrap">
+    <p class="eyebrow reveal">Get Started</p>
+    <h2 class="sec-title rl">Download a Wallet</h2>
+    <p class="sec-sub reveal">Official NewYorkCoin core wallets for all major platforms.</p>
+    <div class="wal-grid cg">
+      <div class="wal-card cv">
+        <div class="wal-os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>Windows</h3>
+        <p>Full node wallet for Windows 10 &amp; 11. Sync the chain and start transacting in minutes.</p>
+        <a href="https://github.com/NewYorkCoinNYC/newyorkcoin/releases" target="_blank" class="wal-link">Download <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v8M4 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="wal-card cv">
+        <div class="wal-os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
+        <h3>macOS</h3>
+        <p>Native macOS wallet with full node support. Compatible with macOS 11 Big Sur and later.</p>
+        <a href="https://github.com/NewYorkCoinNYC/newyorkcoin/releases" target="_blank" class="wal-link">Download <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v8M4 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="wal-card cv">
+        <div class="wal-os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3L4 7l8 4 8-4-8-4zM4 12l8 4 8-4M4 17l8 4 8-4"/></svg></div>
+        <h3>Linux</h3>
+        <p>CLI daemon and GUI wallet for Ubuntu, Debian, Fedora, and major distributions.</p>
+        <a href="https://github.com/NewYorkCoinNYC/newyorkcoin/releases" target="_blank" class="wal-link">Download <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v8M4 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="wal-card cv" style="border-style:dashed">
+        <div class="wal-os" style="background:var(--bg-subtle)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+        <h3>Mobile</h3>
+        <p>iOS &amp; Android wallet coming as part of the new Coinomi-style multi-coin wallet buildout.</p>
+        <span class="wal-link" style="color:var(--text-subtle);pointer-events:none">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMMUNITY ──────────────────────────────────────────────── -->
+<section class="sec com-sec" id="community">
+  <div class="wrap">
+    <p class="eyebrow reveal">Get Involved</p>
+    <h2 class="sec-title rl">Join the NYC Community</h2>
+    <p class="sec-sub reveal">NewYorkCoin is 100% community-governed. Ideas, code, and strategy come from the people who believe in it.</p>
+    <div class="com-grid cg">
+      <a href="https://discord.gg/newyorkcoin" target="_blank" rel="noopener" class="com-card cv">
+        <div class="com-icon" style="background:#5865F2;color:#fff">💬</div>
+        <h3>Discord</h3><p>Main hub — chat, support, dev discussion</p>
+      </a>
+      <a href="https://reddit.com/r/NewYorkCoin" target="_blank" rel="noopener" class="com-card cv">
+        <div class="com-icon" style="background:#FF4500;color:#fff">🔴</div>
+        <h3>Reddit</h3><p>r/NewYorkCoin — news &amp; community votes</p>
+      </a>
+      <a href="https://github.com/NewYorkCoinNYC/newyorkcoin" target="_blank" rel="noopener" class="com-card cv">
+        <div class="com-icon" style="background:#24292e;color:#fff">⚙️</div>
+        <h3>GitHub</h3><p>Open source — contribute, audit, fork</p>
+      </a>
+      <a href="https://twitter.com/NewYorkCoinNYC" target="_blank" rel="noopener" class="com-card cv">
+        <div class="com-icon" style="background:#000;color:#fff;font-weight:700;font-family:var(--sans)">✕</div>
+        <h3>X / Twitter</h3><p>@NewYorkCoinNYC — announcements</p>
+      </a>
+      <a href="https://www.facebook.com/NewYorkCoinCommunity/" target="_blank" rel="noopener" class="com-card cv">
+        <div class="com-icon" style="background:#1877F2;color:#fff;font-weight:700;font-family:var(--sans)">f</div>
+        <h3>Facebook</h3><p>Growing global NYC audience</p>
+      </a>
+      <a href="/blog" class="com-card cv">
+        <div class="com-icon" style="background:var(--sky);color:#fff">📝</div>
+        <h3>Blog</h3><p>Dev updates, news &amp; announcements</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── MERCHANTS ──────────────────────────────────────────────── -->
+<section class="sec mer-sec" id="merchants">
+  <div class="wrap">
+    <p class="eyebrow reveal">NYC Payments</p>
+    <h2 class="sec-title rl">Accept NYC at Your Business</h2>
+    <p class="sec-sub reveal">Zero fees. 30-second confirmations. NYC is the ideal payment currency for any retail or online business.</p>
+    <div class="mer-box reveal">
+      <div>
+        <h2>Ready to Accept NYC?</h2>
+        <p>No processor fees. No chargebacks. No waiting. Add NYC to your checkout today and reach a global community of buyers ready to pay with the fastest free blockchain.</p>
+      </div>
+      <a href="mailto:community@nycoin.community" class="btn-white mag">
+        Get Listed
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="foot-logo">
+          <div class="logo-mark">NYC</div>
+          <span style="font-family:var(--sans);font-weight:700;font-size:var(--tx-sm);color:#fff;letter-spacing:-.01em">NewYork<span style="color:var(--sky)">Coin</span></span>
+        </div>
+        <p>A fast, free, decentralized Layer 1 blockchain. Community-governed since March 6, 2014. No fees. No waiting. No gatekeepers.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Coin</h4>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#specs">Specifications</a></li>
+          <li><a href="#upgrades">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Use NYC</h4>
+        <ul>
+          <li><a href="#wallets">Download Wallet</a></li>
+          <li><a href="#exchanges">Exchanges</a></li>
+          <li><a href="#merchants">For Merchants</a></li>
+          <li><a href="https://chainz.cryptoid.info/nyc/" target="_blank">Block Explorer</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="https://discord.gg/newyorkcoin" target="_blank">Discord</a></li>
+          <li><a href="https://reddit.com/r/NewYorkCoin" target="_blank">Reddit</a></li>
+          <li><a href="https://github.com/NewYorkCoinNYC/newyorkcoin" target="_blank">GitHub</a></li>
+          <li><a href="https://twitter.com/NewYorkCoinNYC" target="_blank">X / Twitter</a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2014–2026 NewYorkCoin Community · Open Source · No Rights Reserved</p>
+      <span class="foot-badge">NYC · Scrypt · PoW · Layer 1 · Free Forever</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Logo: show img if it loads, fallback to mark ───────────────
+const logoImg = document.getElementById('logo-img');
+const logoWrap = document.getElementById('logo-img-wrap');
+const logoMark = document.getElementById('logo-mark');
+if (logoImg) {
+  logoWrap.style.display = 'block';
+  logoImg.addEventListener('error', () => { logoWrap.style.display='none'; logoMark.style.display='flex'; });
+}
+
+// ── Loader ─────────────────────────────────────────────────────
+(function() {
+  const loader = document.getElementById('loader');
+  const lbar   = document.getElementById('lbar');
+  const lcount = document.getElementById('lcount');
+  const llogo  = document.getElementById('loader-logo');
+  gsap.to(llogo, { opacity:1, y:0, duration:.6, ease:'power2.out', delay:.1 });
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 20 + 4;
+    if (p >= 100) { p = 100; clearInterval(iv);
+      setTimeout(() => gsap.to(loader, { yPercent:-100, duration:.9, ease:'power3.inOut',
+        onComplete: () => { loader.style.display='none'; runAnims(); }
+      }), 280);
+    }
+    lcount.textContent = Math.round(p);
+    lbar.style.transform = `scaleX(${p/100})`;
+  }, 55);
+})();
+
+// ── Lenis ──────────────────────────────────────────────────────
+const lenis = new Lenis({ duration:1.2, easing: t => Math.min(1,1.001-Math.pow(2,-10*t)), smoothTouch:false });
+gsap.ticker.add(t => lenis.raf(t * 1000));
+gsap.ticker.lagSmoothing(0);
+lenis.on('scroll', ScrollTrigger.update);
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) lenis.scrollTo(el, { offset:-80, duration:1.4 });
+    if (mobnav.classList.contains('open')) toggleMob();
+  });
+});
+
+// ── Cursor ─────────────────────────────────────────────────────
+const cdot = document.getElementById('cdot'), cring = document.getElementById('cring');
+if (!window.matchMedia('(pointer:coarse)').matches) {
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; gsap.set(cdot,{x:mx,y:my}); });
+  gsap.ticker.add(() => { rx+=(mx-rx)*.15; ry+=(my-ry)*.15; gsap.set(cring,{x:rx,y:ry}); });
+} else { cdot.style.display='none'; cring.style.display='none'; document.body.style.cursor='auto'; }
+
+// ── Nav scroll ─────────────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY>60), { passive:true });
+
+// ── Mobile menu ────────────────────────────────────────────────
+const mbtn = document.getElementById('mbtn'), mobnav = document.getElementById('mobnav');
+function toggleMob() {
+  const open = mobnav.classList.toggle('open');
+  mbtn.classList.toggle('open', open);
+  open ? lenis.stop() : lenis.start();
+  if (open) gsap.from(mobnav.querySelectorAll('.mob-link'), { y:'100%', opacity:0, stagger:.07, duration:.55, ease:'power3.out', delay:.2 });
+}
+mbtn.addEventListener('click', toggleMob);
+mobnav.querySelectorAll('.mob-link').forEach(l => l.addEventListener('click', toggleMob));
+
+// ── Scroll progress ────────────────────────────────────────────
+gsap.to('#sprogress', { scaleX:1, ease:'none', scrollTrigger:{ trigger:document.body, start:'top top', end:'bottom bottom', scrub:true }});
+
+// ── All post-loader animations ─────────────────────────────────
+function runAnims() {
+
+  // Hero title
+  const htitle = document.getElementById('htitle');
+  if (window.SplitType && htitle) {
+    const sp = new SplitType(htitle, { types:'chars,words' });
+    gsap.from(sp.chars, { opacity:0, y:'110%', rotateX:-90, stagger:{ amount:.5, from:'start' }, duration:.9, ease:'power3.out', delay:.15 });
+  } else if (htitle) {
+    gsap.from(htitle, { opacity:0, y:40, duration:1, ease:'power3.out', delay:.15 });
+  }
+
+  // data-reveal elements (hero sub, actions, eyebrow)
+  document.querySelectorAll('[data-reveal]').forEach((el, i) => {
+    gsap.from(el, { opacity:0, y:38, duration:.8, ease:'power2.out', delay:.5 + i*.13 });
+  });
+
+  // Generic .reveal (scroll-triggered)
+  gsap.utils.toArray('.reveal').forEach(el => {
+    gsap.from(el, { opacity:0, y:48, duration:.85, ease:'power2.out',
+      scrollTrigger:{ trigger:el, start:'top 87%', toggleActions:'play none none none' }
+    });
+  });
+
+  // Line-by-line text reveals (.rl)
+  if (window.SplitType) {
+    gsap.utils.toArray('.rl').forEach(el => {
+      const sp = new SplitType(el, { types:'lines' });
+      sp.lines.forEach(l => { const w=document.createElement('div'); w.style.overflow='hidden'; l.parentNode.insertBefore(w,l); w.appendChild(l); });
+      gsap.from(sp.lines, { y:'105%', opacity:0, stagger:.08, duration:.85, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%' }
+      });
+    });
+  }
+
+  // Staggered card grids
+  gsap.utils.toArray('.cg').forEach(grid => {
+    const items = grid.querySelectorAll('.cv');
+    gsap.from(items, { opacity:0, y:55, scale:.97, stagger:{ amount:.4, from:'start' }, duration:.75, ease:'power2.out',
+      scrollTrigger:{ trigger:grid, start:'top 83%' }
+    });
+  });
+
+  // Image clip reveal
+  gsap.utils.toArray('.img-reveal').forEach(el => {
+    gsap.from(el, { clipPath:'inset(100% 0% 0% 0%)', duration:1.2, ease:'power3.inOut',
+      scrollTrigger:{ trigger:el, start:'top 80%' }
+    });
+  });
+
+  // Counters
+  gsap.utils.toArray('.ctr').forEach(el => {
+    const t = parseInt(el.dataset.t), s = el.dataset.s||'';
+    const obj = { v:0 };
+    gsap.to(obj, { v:t, duration:2.2, ease:'power1.out',
+      scrollTrigger:{ trigger:el, start:'top 86%', once:true },
+      onUpdate() { el.textContent = Math.round(obj.v).toLocaleString() + s; }
+    });
+  });
+
+  // Magnetic buttons
+  document.querySelectorAll('.mag').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      gsap.to(btn, { x:(e.clientX-r.left-r.width/2)*.35, y:(e.clientY-r.top-r.height/2)*.35, duration:.4, ease:'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => gsap.to(btn, { x:0, y:0, duration:.7, ease:'elastic.out(1,.75)' }));
+  });
+
+  // Upgrade cards
+  gsap.utils.toArray('.up-card').forEach((c, i) => {
+    gsap.from(c, { opacity:0, y:50, duration:.8, ease:'power2.out', delay:i*.1,
+      scrollTrigger:{ trigger:c, start:'top 86%' }
+    });
+  });
+
+  // Stat cards
+  gsap.from('.stat-card', { opacity:0, y:28, stagger:.1, duration:.7, ease:'power2.out',
+    scrollTrigger:{ trigger:'.stats-grid', start:'top 85%' }
+  });
+
+  // Hero orb parallax
+  gsap.to('.orb1', { y:-60, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1 }});
+  gsap.to('.orb2', { y:-40, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1.5 }});
+}
+</script>
+</body>
+</html>
