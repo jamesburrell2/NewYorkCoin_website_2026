@@ -1,0 +1,5 @@
+# Force shell scripts to LF so they run correctly on Linux servers
+*.sh text eol=lf
+
+# Force all other text files to use LF
+* text=auto
