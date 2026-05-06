@@ -18,5 +18,8 @@ balr_VPS*
 # Temp / build
 *.tmp
 *.log
+
+# APK binaries — large files, deployed directly via SCP not git
+*.apk
 __pycache__/
 *.pyc

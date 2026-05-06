@@ -13,6 +13,7 @@ Write-Host "[2/5] Uploading site files..." -ForegroundColor Yellow
 & scp -i $KEY -o StrictHostKeyChecking=no "index.html"             "${REMOTE}:${WEBROOT}/"
 & scp -i $KEY -o StrictHostKeyChecking=no "nyc-logo.png"           "${REMOTE}:${WEBROOT}/"
 & scp -i $KEY -o StrictHostKeyChecking=no "nyc-logo-sm.png"        "${REMOTE}:${WEBROOT}/"
+& scp -i $KEY -o StrictHostKeyChecking=no "nyc-openwallet-v1.8.4.apk" "${REMOTE}:${WEBROOT}/"
 Write-Host "    Files uploaded OK" -ForegroundColor Green
 
 Write-Host "[3/5] Uploading Nginx config..." -ForegroundColor Yellow
